@@ -27,6 +27,7 @@ public class Utils {
 	public static String getTokenSecret() {
 		return base64SecretBytes;
 	}
+	//end
 
 	public String generateEmailVerificationToken(Long userId) {
 		String token = Jwts.builder().setSubject(userId.toString())
