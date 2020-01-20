@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width-device-width, initial-scale=1.0">
+<script src="jquery-3.2.1.js"></script>
+<script language="javascript">
+	(function() {
+	var urlParams = new URLSearchParams(location.search);
+		if (urlParams.has('token')) {
+			verifyToken(urlParams.get('token'));
+		}
+		async function verifyToken(tokenVal){
+		  const url = 'http://127.0.0.1:8080/users/activate?token='+tokenVal;
+		
+		  let response = await fetch(url, { method: 'GET' });
+		  console.log(response);
+		  return await response.json().then(data => {
+			  console.log(data)
+			  document.getElementById("result").innerHTML = data.status;
+		  })
+		};		
+				
+	})();
+</script>
+<title>Email verification Service</title>
+</head>
+<body>
+
+	<div id="result"></div>
+</body>
+</html>
+

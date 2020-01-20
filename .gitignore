@@ -29,3 +29,28 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+  
+*.class
+
+# Mac
+.DS_Store
+
+# Maven
+target
+*.log
+*.log.*
+
+# Mobile Tools for Java (J2ME)
+.mtj
+.tmp/
+
+# Package Files #
+
+*.jar
+*.war
+*.ear
+
+
+/src/main/resources/application.properties

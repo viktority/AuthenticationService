@@ -1,10 +1,13 @@
 package com.viktority.trials.repositories;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-import com.viktority.trials.entities.UserEntity;
+import com.viktority.trials.entities.Users;
 
-public interface UsersRepository extends CrudRepository<UserEntity, Long> {
-	UserEntity findByEmail(String email);
-	UserEntity findByUserId(String userId);
+@Repository
+public interface UsersRepository extends CrudRepository<Users, Long> {
+	Users findByEmail(String email);
+	Users findByUserId(String userId);
+	Users findByToken(String token);
 }
