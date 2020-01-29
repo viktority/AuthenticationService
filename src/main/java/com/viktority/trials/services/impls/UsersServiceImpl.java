@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import static java.util.stream.Collectors.toList;
 
 import javax.persistence.EntityExistsException;
 
@@ -166,23 +167,35 @@ public class UsersServiceImpl implements UsersService {
 	}
 
 	private List<String> getPrivileges(Collection<Role> roles) {
-
 		List<String> privileges = new ArrayList<>();
-		List<Privilege> collection = new ArrayList<>();
-		for (Role role : roles) {
-			collection.addAll(role.getPrivileges());
-		}
-		for (Privilege item : collection) {
-			privileges.add(item.getName());
-		}
+//		//List<Collection<Privilege>> privilegess = 
+//				roles.stream()
+//				.map(p -> p.getPrivileges())
+//				//.collect(toList());
+//		//privilegess
+//		//.stream()
+//		.forEach(p -> p.forEach((y) -> {
+//			privileges.add(y.getName());
+//		}));
+
+		roles.stream().map(p -> p.getPrivileges()).forEach(p -> p.forEach((y) -> {
+			privileges.add(y.getName());
+		}));
+
+//		List<Privilege> collection = new ArrayList<>();
+//
+//		for (Role role : roles) {
+//			collection.addAll(role.getPrivileges());
+//		}
+//		for (Privilege item : collection) {
+//			privileges.add(item.getName());
+//		}
 		return privileges;
 	}
 
 	private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
-		List<GrantedAuthority> authorities = new ArrayList<>();
-		for (String privilege : privileges) {
-			authorities.add(new SimpleGrantedAuthority(privilege));
-		}
+		List<GrantedAuthority> authorities = privileges.stream().map(p -> new SimpleGrantedAuthority(p))
+				.collect(toList());
 		return authorities;
 	}
 

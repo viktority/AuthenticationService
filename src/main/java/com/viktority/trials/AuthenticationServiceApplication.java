@@ -9,9 +9,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class AuthenticationServiceApplication {
 
 	public static void main(String[] args) {
-		System.out.println("System Up");
-		SpringApplication.run(AuthenticationServiceApplication.class, args);
 
+		SpringApplication.run(AuthenticationServiceApplication.class, args);
+		System.err.println("System Up");
 	}
 
 	@Bean

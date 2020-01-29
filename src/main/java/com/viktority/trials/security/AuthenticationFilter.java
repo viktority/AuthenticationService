@@ -45,9 +45,9 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 			LoginRequestModel creds = new ObjectMapper().readValue(req.getInputStream(), LoginRequestModel.class);
 
-			return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(creds.getEmail(),
-					creds.getPassword(),new ArrayList<>()));
-			 //usersService.getAuthorities(usersService.getUserRoles(creds.getEmail()))
+			return getAuthenticationManager().authenticate(
+					new UsernamePasswordAuthenticationToken(creds.getEmail(), creds.getPassword(), new ArrayList<>()));
+			// usersService.getAuthorities(usersService.getUserRoles(creds.getEmail()))
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -61,15 +61,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		Users userDetails = usersService.getUserDetailsByEmail(userName);
 		// roles.put("albums", userDetails.getAlbums());
 
-		String token = "Bearer " + getToken(userDetails);
-
+		String token = environment.getProperty("authorization.token.header.prefix") +" "+ getToken(userDetails);
 		res.addHeader("token", token);
 		res.addHeader("userId", userDetails.getUserId());
 	}
 
 	private String getToken(Users userDetails) {
 		return Jwts.builder().setSubject(userDetails.getUserId())
-				.setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(environment.getProperty("token.expiration_time"))))
+				.setExpiration(new Date(
+						System.currentTimeMillis() + Long.parseLong(environment.getProperty("token.expiration_time"))))
 				.signWith(SignatureAlgorithm.HS512, Utils.getTokenSecret()).compact();
 	}
 

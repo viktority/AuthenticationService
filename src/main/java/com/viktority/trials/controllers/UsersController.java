@@ -46,8 +46,8 @@ public class UsersController {
 
 	@GetMapping("/status/check")
 	@ApiImplicitParams({ @ApiImplicitParam(name = "Authorization", value = "token", paramType = "header") })
-	// @PreAuthorize("hasRole('ROLE_ADMIN')")
-	@Secured("CREATE_PRIVILEGE")
+	@PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
+	// @Secured("CREATE_PRIVILEGE")
 	public String status() {
 		return "Working on port " + env.getProperty("local.server.port") + ", with token = "
 				+ env.getProperty("token.secret");
