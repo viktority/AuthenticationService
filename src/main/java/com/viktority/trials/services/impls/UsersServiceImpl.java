@@ -142,7 +142,6 @@ public class UsersServiceImpl implements UsersService {
 				profile.setActive(true);
 				profile.setToken(null);
 				usersRepository.save(profile);
-				rm.setName("Account Activation");
 				rm.setStatus("Activated");
 				return ResponseEntity.status(HttpStatus.OK).body(rm);
 
@@ -152,7 +151,6 @@ public class UsersServiceImpl implements UsersService {
 				profile.setToken(newToken);
 				usersRepository.save(profile);
 				return activateProfile(newToken);
-				// return ResponseEntity.status(HttpStatus.OK).body(rm);
 			}
 
 		} else {
@@ -168,28 +166,10 @@ public class UsersServiceImpl implements UsersService {
 
 	private List<String> getPrivileges(Collection<Role> roles) {
 		List<String> privileges = new ArrayList<>();
-//		//List<Collection<Privilege>> privilegess = 
-//				roles.stream()
-//				.map(p -> p.getPrivileges())
-//				//.collect(toList());
-//		//privilegess
-//		//.stream()
-//		.forEach(p -> p.forEach((y) -> {
-//			privileges.add(y.getName());
-//		}));
-
 		roles.stream().map(p -> p.getPrivileges()).forEach(p -> p.forEach((y) -> {
 			privileges.add(y.getName());
 		}));
 
-//		List<Privilege> collection = new ArrayList<>();
-//
-//		for (Role role : roles) {
-//			collection.addAll(role.getPrivileges());
-//		}
-//		for (Privilege item : collection) {
-//			privileges.add(item.getName());
-//		}
 		return privileges;
 	}
 
