@@ -32,20 +32,17 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.
-		cors().and().csrf().disable();
-		http.authorizeRequests()
-		.antMatchers(HttpMethod.POST, environment.getProperty("signup.url.path")).permitAll()
-		.antMatchers(environment.getProperty("jsp.url.path")).permitAll()
-		.antMatchers(HttpMethod.GET, environment.getProperty("token.activation.url.path")).permitAll()
+		http.cors().and().csrf().disable();
+		http.authorizeRequests().antMatchers(HttpMethod.POST, environment.getProperty("signup.url.path")).permitAll()
+				.antMatchers(HttpMethod.POST, environment.getProperty("password.reset.request.path")).permitAll()
+				.antMatchers(HttpMethod.POST, environment.getProperty("password.reset.path")).permitAll()
+				.antMatchers(environment.getProperty("jsp.url.path")).permitAll()
+				.antMatchers(HttpMethod.GET, environment.getProperty("token.activation.url.path")).permitAll()
 				.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/profile_image/**",
 						"**/swagger-resources/**", "/swagger-ui.html")
-				.permitAll()
-				.anyRequest().authenticated()
-				.and().addFilter(getAuthenticationFilter())
-				.addFilter(new AuthorizationFilter(authenticationManager(), environment,usersService))
-				.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+				.permitAll().anyRequest().authenticated().and().addFilter(getAuthenticationFilter())
+				.addFilter(new AuthorizationFilter(authenticationManager(), environment, usersService))
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.headers().frameOptions().disable();
 	}
 
@@ -62,5 +59,4 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		auth.userDetailsService(usersService).passwordEncoder(bCryptPasswordEncoder);
 	}
 
-	
 }

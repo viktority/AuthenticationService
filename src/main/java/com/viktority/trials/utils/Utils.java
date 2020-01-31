@@ -28,14 +28,6 @@ public class Utils {
 		return base64SecretBytes;
 	}
 
-	public String generateEmailVerificationToken(Long userId) {
-		String token = Jwts.builder().setSubject(userId.toString())
-				.setExpiration(new Date(System.currentTimeMillis()
-						+ Long.parseLong(env.getProperty("email.verification.token.expiration_time"))))
-				.signWith(SignatureAlgorithm.HS512, getTokenSecret()).compact();
-		return token;
-	}
-
 	public static boolean hasTokenExpired(String token) {
 		try {
 			Claims claims = Jwts.parser().setSigningKey(getTokenSecret()).parseClaimsJws(token).getBody();
@@ -47,5 +39,12 @@ public class Utils {
 		} catch (SignatureException ex) {
 			return true;
 		}
+	}
+
+	public static String generateToken(Long userId, Long expirationTime) {
+		String token = Jwts.builder().setSubject(userId.toString())
+				.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+				.signWith(SignatureAlgorithm.HS512, getTokenSecret()).compact();
+		return token;
 	}
 }

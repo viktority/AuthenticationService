@@ -23,9 +23,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.viktority.trials.entities.Privilege;
+import com.viktority.trials.entities.PasswordResetToken;
 import com.viktority.trials.entities.Role;
 import com.viktority.trials.entities.Users;
+import com.viktority.trials.repositories.PasswordResetTokenRepository;
 import com.viktority.trials.repositories.RoleRepository;
 import com.viktority.trials.repositories.UsersRepository;
 import com.viktority.trials.services.UsersService;
@@ -42,15 +43,18 @@ public class UsersServiceImpl implements UsersService {
 	Environment environment;
 	RoleRepository roleRepository;
 	Utils util;
+	PasswordResetTokenRepository passwordResetTokenRepository;
 
 	@Autowired
 	public UsersServiceImpl(UsersRepository usersRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
-			Environment environment, RoleRepository roleRepository, Utils util) {
+			Environment environment, RoleRepository roleRepository, Utils util,
+			PasswordResetTokenRepository passwordResetTokenRepository) {
 		this.usersRepository = usersRepository;
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 		this.environment = environment;
 		this.roleRepository = roleRepository;
 		this.util = util;
+		this.passwordResetTokenRepository = passwordResetTokenRepository;
 	}
 
 	@Override
@@ -69,7 +73,8 @@ public class UsersServiceImpl implements UsersService {
 		userEntity.setRoles(Arrays.asList(roleRepository.findByName("ROLE_ADMIN")));
 		userEntity.setTokenExpired(false);
 		userEntity.setEnabled(true);
-		userEntity.setToken(util.generateEmailVerificationToken(userEntity.getId()));
+		Long expTime = Long.parseLong(environment.getProperty("email.verification.token.expiration_time"));
+		userEntity.setToken(Utils.generateToken(userEntity.getId(), expTime));
 		userEntity.setActive(false);
 		Users returnValue = usersRepository.save(userEntity);
 		new AmazonSES().verifyEmail(returnValue);
@@ -146,8 +151,8 @@ public class UsersServiceImpl implements UsersService {
 				return ResponseEntity.status(HttpStatus.OK).body(rm);
 
 			} else {
-				// rm.setStatus("Expired");
-				String newToken = util.generateEmailVerificationToken(profile.getId());
+				Long expTime = Long.parseLong(environment.getProperty("email.verification.token.expiration_time"));
+				String newToken = Utils.generateToken(profile.getId(), expTime);
 				profile.setToken(newToken);
 				usersRepository.save(profile);
 				return activateProfile(newToken);
@@ -165,6 +170,7 @@ public class UsersServiceImpl implements UsersService {
 	}
 
 	private List<String> getPrivileges(Collection<Role> roles) {
+
 		List<String> privileges = new ArrayList<>();
 		roles.stream().map(p -> p.getPrivileges()).forEach(p -> p.forEach((y) -> {
 			privileges.add(y.getName());
@@ -177,6 +183,58 @@ public class UsersServiceImpl implements UsersService {
 		List<GrantedAuthority> authorities = privileges.stream().map(p -> new SimpleGrantedAuthority(p))
 				.collect(toList());
 		return authorities;
+	}
+
+	@Override
+	public boolean requestPasswordReset(String email) {
+		boolean returnValue = false;
+		Users userEntity = usersRepository.findByEmail(email);
+		if (userEntity == null) {
+			return returnValue;
+		}
+		Long expTime = Long.parseLong(environment.getProperty("password.reset.token.expiration_time"));
+		String token = Utils.generateToken(userEntity.getId(), expTime);
+
+		PasswordResetToken prte = new PasswordResetToken();
+		prte.setToken(token);
+		prte.setUser(userEntity);
+		passwordResetTokenRepository.save(prte);
+
+		returnValue = new AmazonSES().sendPasswordResetRequest(userEntity.getFirstName(), userEntity.getEmail(), token);
+
+		return returnValue;
+	}
+
+	@Override
+	public ResponseModel resetPassword(String token, String password) {
+		ResponseModel rm = new ResponseModel();
+		rm.setName("Password Reset!");
+		rm.setStatus("Reset Failed!");
+		boolean expired = Utils.hasTokenExpired(token);
+
+		if (expired) {
+			rm.setStatus("Token Expired!");
+			return rm;
+		}
+
+		PasswordResetToken prte = passwordResetTokenRepository.findByToken(token);
+
+		if (prte == null) {
+			rm.setStatus("Token Invalid");
+			return rm;
+		}
+
+		String encryptedPassword = bCryptPasswordEncoder.encode(password);
+		Users user = prte.getUser();
+		user.setEncryptedPassword(encryptedPassword);
+		Users saved = usersRepository.save(user);
+
+		if (saved != null && saved.getEncryptedPassword().equalsIgnoreCase(encryptedPassword)) {
+			rm.setStatus("Password Updated!");
+		}
+
+		passwordResetTokenRepository.delete(prte);
+		return rm;
 	}
 
 }

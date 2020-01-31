@@ -2,18 +2,13 @@ package com.viktority.trials.controllers;
 
 import java.util.List;
 
-import javax.annotation.security.RolesAllowed;
-import javax.websocket.server.PathParam;
-
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,12 +22,15 @@ import com.viktority.trials.entities.Users;
 import com.viktority.trials.services.UsersService;
 import com.viktority.trials.services.models.CreateUserRequestModel;
 import com.viktority.trials.services.models.LoginRequestModel;
+import com.viktority.trials.services.models.PasswordResetModel;
+import com.viktority.trials.services.models.PasswordResetRequestModel;
+import com.viktority.trials.services.models.ResponseModel;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/users")
@@ -100,5 +98,24 @@ public class UsersController {
 	public ResponseEntity<?> activateAccount(@RequestParam("token") String token) {
 
 		return usersService.activateProfile(token);
+	}
+
+	@ApiOperation(value = "Send mail to request for a generated Token for password reset!", notes = "")
+	@PostMapping(path = "/password-reset-request", produces = { MediaType.APPLICATION_JSON_VALUE }, consumes = {
+			MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<Boolean> requestReset(@RequestBody PasswordResetRequestModel passwordResetRequestModel) {
+
+		boolean operationResult = usersService.requestPasswordReset(passwordResetRequestModel.getEmail());
+
+		return ResponseEntity.status(HttpStatus.OK).body(operationResult);
+	}
+
+	@PostMapping(path = "/password-reset", consumes = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<?> resetPassword(@RequestBody PasswordResetModel passwordResetModel) {
+
+		ResponseModel operationResult = usersService.resetPassword(passwordResetModel.getToken(),
+				passwordResetModel.getPassword());
+
+		return ResponseEntity.status(HttpStatus.OK).body(operationResult);
 	}
 }

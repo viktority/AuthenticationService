@@ -28,4 +28,8 @@ public interface UsersService extends UserDetailsService {
 	List<Users> getUsers();
 
 	public ResponseEntity<ResponseModel> activateProfile(String token);
+
+	boolean requestPasswordReset(String email);
+
+	ResponseModel resetPassword(String token, String password);
 }
