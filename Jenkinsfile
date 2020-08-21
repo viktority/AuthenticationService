@@ -6,25 +6,25 @@ pipeline {
     stages {
         stage('Maven Version') {
             steps {
-                sh 'mvn --version'
+                bat 'mvn --version'
             }
         }
         stage('Java Version') {
                     steps {
-                        sh 'javac -version'
-                        sh 'java -version'
+                        bat 'javac -version'
+                        bat 'java -version'
                     }
                 }
         stage('Maven Build') {
                      steps {
                             
-							sh 'mvn clean install'
+							bat 'mvn clean install'
                             }
                                }
         stage('SOnar Analysis') {
                              steps {
 
-        							sh 'mvn sonar:sonar'
+        							bat 'mvn sonar:sonar'
                                     }
                                        }
     }
