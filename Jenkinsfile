@@ -15,18 +15,12 @@ pipeline {
                         bat 'java -version'
                     }
                 }
-        stage('Maven Build') {
+        stage('Maven Build and Sonar Anaylysis') {
                      steps {
                             
-							bat 'mvn clean install'
+							bat 'mvn clean package sonar:sonar'
                             }
                                }
-        stage('SOnar Analysis') {
-                             steps {
-
-        							bat 'mvn sonar:sonar'
-                                    }
-                                       }
     }
     triggers {
       bitbucketPush()
