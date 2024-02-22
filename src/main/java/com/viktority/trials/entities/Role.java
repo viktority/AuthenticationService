@@ -16,12 +16,8 @@ import javax.persistence.ManyToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity(name = "roles")
-@Data
-@NoArgsConstructor
 @JsonIgnoreType
 public class Role implements Serializable {
 
@@ -43,4 +39,39 @@ public class Role implements Serializable {
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "roles_privileges", joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
 	private Collection<Privilege> privileges;
+
+	public Role() {
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Collection<Users> getUsers() {
+		return users;
+	}
+
+	public void setUsers(Collection<Users> users) {
+		this.users = users;
+	}
+
+	public Collection<Privilege> getPrivileges() {
+		return privileges;
+	}
+
+	public void setPrivileges(Collection<Privilege> privileges) {
+		this.privileges = privileges;
+	}
 }

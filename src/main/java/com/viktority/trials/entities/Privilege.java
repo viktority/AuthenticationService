@@ -11,12 +11,10 @@ import javax.persistence.ManyToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @Entity
-@Data
-@NoArgsConstructor
+
 @JsonIgnoreType
 public class Privilege implements Serializable {
 
@@ -35,4 +33,31 @@ public class Privilege implements Serializable {
 
 	@ManyToMany(mappedBy = "privileges")
 	private Collection<Role> roles;
+
+	public Privilege() {
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Collection<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Collection<Role> roles) {
+		this.roles = roles;
+	}
 }

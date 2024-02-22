@@ -1,9 +1,15 @@
 package com.viktority.trials.services.models;
 
-import lombok.Data;
 
-@Data
+
 public class PasswordResetRequestModel {
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
 	private String email;
 }

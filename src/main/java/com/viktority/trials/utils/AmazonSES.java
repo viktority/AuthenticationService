@@ -70,7 +70,7 @@ public class AmazonSES {
 						.withSubject(new Content().withCharset("UTF-8").withData(SUBJECT)))
 				.withSource(FROM);
 
-		client.sendEmail(request);
+		//client.sendEmail(request);
 
 	}
 
@@ -93,10 +93,10 @@ public class AmazonSES {
 						.withSubject(new Content().withCharset("UTF-8").withData(PASSWORD_RESET_SUBJECT)))
 				.withSource(FROM);
 
-		SendEmailResult result = client.sendEmail(request);
+		/*SendEmailResult result = client.sendEmail(request);
 		if (result != null && (result.getMessageId() != null && !result.getMessageId().isEmpty())) {
 			returnValue = true;
-		}
+		}*/
 
 		return returnValue;
 	}
